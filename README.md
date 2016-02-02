@@ -29,15 +29,17 @@
 #数据库设计
 
 使用mysql存储用户信息,user表如下:<br/>
-<pre>+---------------+-------------+------+-----+---------+----------------+</pre>
-<pre>| Field         | Type        | Null | Key | Default | Extra          |</pre>
-<pre>+---------------+-------------+------+-----+---------+----------------+</pre>
-<pre>| user_id       | int         | NO   | MUL | NULL    |auto_increment  |</pre>
-<pre>| user_name     | varchar(64) | NO   |     | NULL    |                |</pre>
-<pre>| user_nicename | varchar(64) | NO   |     | NULL    |                |</pre>
-<pre>| user_email    | varchar(64) | NO   |     | NULL    |                |</pre>
-<pre>| user_pass     | varchar(64) | NO   |     | NULL    |                |</pre>
-<pre>+---------------+-------------+------+-----+---------+----------------+</pre>
+<pre>
++---------------+-------------+------+-----+---------+----------------+
+| Field         | Type        | Null | Key | Default | Extra          |
++---------------+-------------+------+-----+---------+----------------+
+| user_id       | int         | NO   | MUL | NULL    |auto_increment  |
+| user_name     | varchar(64) | NO   |     | NULL    |                |
+| user_nicename | varchar(64) | NO   |     | NULL    |                |
+| user_email    | varchar(64) | NO   |     | NULL    |                |
+| user_pass     | varchar(64) | NO   |     | NULL    |                |
++---------------+-------------+------+-----+---------+----------------+
+</pre>
 
 在词汇存储中,例句,造句的个数都是不定的,所以采用noSqL数据库,这里使用mongoDB数据库
 在存储时,除了词汇的基本信息外,还应包括存储时间(采用系统时间),存储用户id
