@@ -20,4 +20,11 @@ class User(db.Model):
     def __repr__(self):
         return "user's name is %s,email is %s,nikename is %s"%(self.user_name,self.user_email,self.user_nikename)
 
-
+    '''自定义转成json格式函数'''
+    def toJson(self):
+        return{
+            'id':self.user_id,
+            'userName':self.user_name,
+            'userNikename':self.user_nikename,
+            'user_email':self.user_email,
+        }
