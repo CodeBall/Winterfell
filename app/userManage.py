@@ -1,46 +1,38 @@
 #!/usr/bin/env python
-# encoding: utf-8
+#-*- coding:utf-8 –*-
 from app import db
-from app import User
+from app.models import User
+from flask import request
 
-#查找最大ID
-def get_max_id():
-    user = User.query.order_by(User.user_id.desc()).first()
-    return user.user_id
 
 #根据id查找用户信息
 def get_user_by_id(userId):
     user = User.query.filter_by(user_id=userId).first()
+    user = user.toJson()
     return user
 
 #根据邮箱查询用户信息
-del get_user_by_email(userEmail):
+def get_user_by_email(userEmail):
     user = User.query.filter_by(user_email=userEmail).first()
     return user
 
 
 #添加用户信息
-def add_user(userinfo):
-    #获取添加数据之前的id
-    id1 = get_maxc_id()
+def add_user():
     user = User()
 
-    user.user_name = userinfo['userName']
-    user.user_nikename = userinfo['userNikename']
-    user.user_email = userinfo['userEmail']
-    user.user_pass = userinfo['userPass']
+    user.user_name = request.json['userName']
+    user.user_nikename = request.json['userNikename']
+    user.user_email = request.json['userEmail']
+    user.user_pass = request.json['userPass']
 
     #数据持久化
-    db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except Exception as err:
+        db.session.rollback
 
-    #获取添加数据之后的id
-    id2 = get_max_id()
-    #判断是否添加成功
-    if(id1 + 1 == id2):
-        return "用户申请成功"
-    else:
-        return "用户申请失败,请重试"
 
 #删除用户信息
 def delete_user(userId):
@@ -51,18 +43,17 @@ def delete_user(userId):
     db.session.commit()
 
 #修改用户信息
-def change_user(userinfo):
+def change_user():
     #根据id找到该用户的信息
-    user = get_user_by_id(userinfo.user_id)
+    user = get_user_by_id(request.json["user_id"])
     #更新用户信息
-    user.user_name = userinfo.user_name
-    user.user_nikename = userinfo.user_nikename
-    user.user_email = userinfo.user_email
-    user.user_pass = userinfo.user_pass
+    user.user_name = request.json["user_name"]
+    user.user_nikename = request.json['user_nikename']
+    user.user_email = request.json['user_email']
+    user.user_pass = request.json['user_pass']
 
     #数据持久化
     db.session.commit()
-    return "用户信息更改成功"
 
 
 

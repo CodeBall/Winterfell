@@ -19,3 +19,6 @@ class development(Config):
     )
 
 config = {'default':development}
+
+MONGO_URI = 'mongodb://localhost:27017/'
+MONGO_DATABASE = 'Winterfell'
