@@ -5,7 +5,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext import restful
 from config import config
-from pymongo import MongoClient
+import pymongo
 import os
 
 app = Flask(__name__)
@@ -15,7 +15,9 @@ api = restful.Api(app)
 db = SQLAlchemy(app)
 
 #链接mongodb
-client = MongoClient()
+client = pymongo.MongoClient('mongodb://localhost:27017')
+database = client.mongo_test
+collect = database.words
 
 with app.app_context():
     config_name = os.getenv('CONFIG') or 'default'
@@ -29,3 +31,4 @@ from .models import *
 from .userManage import *
 from .wordManage import *
 from .userControl import *
+from .wordControl import *

@@ -18,7 +18,5 @@ class development(Config):
         os.environ.get('DATABASE_DB','Winterfell'),
     )
 
-config = {'default':development}
 
-MONGO_URI = 'mongodb://localhost:27017/'
-MONGO_DATABASE = 'Winterfell'
+config = {'default':development}

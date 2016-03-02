@@ -4,7 +4,6 @@
 from flask.ext.restful import Resource
 from flask import request
 from app import api, db
-from userManage import *
 from app.models import User
 
 class Users(Resource):
@@ -46,7 +45,13 @@ class UserLists(Resource):
         user.user_email = request.json['email']
         user.user_pass = request.json['password']
         db.session.commit()
+class UserEmail(Resource):
+   def get(self,email):
+        user = User.query.filter_by(user_email = email).first()
+        user = user.toJson()
+        return user
 
 
-api.add_resource(Users,'/users/<int:user_id>')
+api.add_resource(Users,'/users/<int:userId>')
 api.add_resource(UserLists,'/users')
+api.add_resource(UserEmail,'/userbyemail/<string:email>')
