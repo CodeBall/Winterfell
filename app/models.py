@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from app import db
+import md5
 
 class User(db.Model):
     user_id=db.Column(db.Integer,primary_key=True)
@@ -22,3 +23,13 @@ class User(db.Model):
             'userNikename':self.user_nikename,
             'user_email':self.user_email,
         }
+    def hash_password(self,password):
+        m1 = md5.new()
+        m1.update(password)
+        return m1.hexdigest()
+
+    def verify_password(self,password):
+        if self.user_pass == password:
+            return True
+        else:
+            return False
