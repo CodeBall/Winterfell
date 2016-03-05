@@ -5,6 +5,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext import restful
 from config import config
+from flask.ext.httpauth import HTTPBasicAuth
 import pymongo
 import os
 
@@ -13,6 +14,8 @@ api = restful.Api(app)
 
 #链接mysql
 db = SQLAlchemy(app)
+
+auth = HTTPBasicAuth()
 
 #链接mongodb
 client = pymongo.MongoClient('mongodb://localhost:27017')
@@ -32,3 +35,4 @@ from .userManage import *
 from .wordManage import *
 from .userControl import *
 from .wordControl import *
+from .login import *

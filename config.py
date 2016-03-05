@@ -20,3 +20,4 @@ class development(Config):
 
 
 config = {'default':development}
+secret_key = 'the quick brown fox jumps over the lazy dog'
