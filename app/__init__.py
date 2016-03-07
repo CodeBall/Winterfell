@@ -31,8 +31,6 @@ with app.app_context():
     db.init_app(app)
 
 from .models import *
-from .userManage import *
-from .wordManage import *
 from .userControl import *
 from .wordControl import *
 from .login import *

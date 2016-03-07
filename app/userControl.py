@@ -3,7 +3,7 @@
 
 from flask.ext.restful import Resource
 from flask import request,abort,jsonify
-from app import api, db
+from app import api, db,auth
 from app.models import User
 
 class Users(Resource):
@@ -11,12 +11,14 @@ class Users(Resource):
         user = User.query.filter_by(user_id=userId).first()
         user = user.toJson()
         return user
+    @auth.login_required
     def delete(self,userId):
         User.query.filter_by(user_id=userId).delete()
         db.session.commit()
 
 
 class UserLists(Resource):
+    @auth.login_required
     def post(self):
         user = User()
         username = request.json['username']
@@ -37,6 +39,7 @@ class UserLists(Resource):
 
         return jsonify({'username':username,'nikename':nikename,'email':email})
 
+    @auth.login_required
     def put(self):
         user = User.query.filter_by(user_id=request.json['id']).first()
         user.user_id = request.json['id']
@@ -46,7 +49,7 @@ class UserLists(Resource):
         user.user_pass = request.json['password']
         db.session.commit()
 class UserEmail(Resource):
-   def get(self,email):
+    def get(self,email):
         user = User.query.filter_by(user_email = email).first()
         user = user.toJson()
         return user

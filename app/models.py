@@ -56,5 +56,5 @@ class User(db.Model):
         except BadSignature:
             return None    # invalid token
         user = User.query.get(data['user_id'])
-        return user
+        return user.user_id
 

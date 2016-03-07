@@ -26,7 +26,7 @@ class userLogin(Resource):
     @auth.login_required
     def get(self):
         token = g.user.generate_auth_token(3600)
-        return jsonify({'token': token.decode('ascii'), 'duration': 600})
+        return jsonify({'token': token.decode('ascii'), 'duration': 600,'user_id':g.user.user_id})
 
 
 api.add_resource(userLogin,'/users/login')

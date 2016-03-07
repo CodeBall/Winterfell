@@ -5,9 +5,10 @@ import pymongo
 import config
 from flask.ext.restful import Resource
 from flask import request
-from app import api
+from app import api,auth
 from app import collect
 from datetime import datetime
+from flask import g
 import json
 
 #获取所有单词信息
@@ -94,21 +95,24 @@ api.add_resource(wordsByMake,'/words/make/<int:userId>/<string:keyWords>')
 
 #修改释义
 class putParaphrase(Resource):
+    @auth.login_required
     def put(self):
         collect.update({"word_id":request.json['word_id']},{"$set":{"paraphrase":request.json['paraphrase']}})
-
 #修改/添加第一条造句
 class putMake1(Resource):
+    @auth.login_required
     def put(self):
         collect.update({"word_id":request.json['word_id']},{"$set":{"make_sent1":request.json['make_sent1']}})
 
 #修改/添加第二条造句
 class putMake2(Resource):
+    @auth.login_required
     def put(self):
         collect.update({"word_id":request.json['word_id']},{"$set":{"make_sent2":request.json["make_sent2"]}})
 
 #修改/添加第三条造句
 class putMake3(Resource):
+    @auth.login_required
     def put(self):
         collect.update({"word_id":request.json['word_id']},{"$set":{"make_sent3":request.json["make_sent3"]}})
 
@@ -120,6 +124,7 @@ api.add_resource(putMake3,'/words/put/make3')
 
 #删除单词信息
 class deleteWord(Resource):
+    @auth.login_required
     def delete(self,wordId):
         collect.remove({"word_id":wordId})
 
@@ -127,6 +132,7 @@ api.add_resource(deleteWord,'/words/delete/<int:wordId>')
 
 #添加单词信息
 class addWord(Resource):
+    @auth.login_required
     def post(self):
         count = collect.find_one({"count_id":1},{"_id":0})
         word_id = count['count']+1
