@@ -45,16 +45,15 @@ class User(db.Model):
         return s.dumps({'user_id':self.user_id})
 
 
-    #验证token
-    @staticmethod
-    def verify_auth_token(token):
-        s = Serializer(secret_key)
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            return None    # valid token, but expired
-        except BadSignature:
-            return None    # invalid token
-        user = User.query.get(data['user_id'])
-        return user.user_id
+#验证token
+def verify_auth_token(token):
+    s = Serializer(secret_key)
+    try:
+        data = s.loads(token)
+    except SignatureExpired:
+        return None    # valid token, but expired
+    except BadSignature:
+        return None    # invalid token
+    user = User.query.get(data['user_id'])
+    return user
 

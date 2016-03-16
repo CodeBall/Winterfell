@@ -3,30 +3,24 @@
 
 from app.models import User
 from flask.ext.restful import Resource
-from flask import jsonify,g
+from flask import jsonify,request
 from app import auth,api
 import md5
 
-@auth.verify_password
-def verify_password(username_or_token,password):
-    m1 = md5.new()
-    m1.update(password)
-    password = m1.hexdigest()
-
-    user = User.verify_auth_token(username_or_token)
-    if not user:
-        user = User.query.filter_by(user_email = username_or_token).first()
-        if not user or not user.verify_password(password):
-            return False
-
-    g.user = user
-    return True
 
 class userLogin(Resource):
-    @auth.login_required
-    def get(self):
-        token = g.user.generate_auth_token(3600)
-        return jsonify({'token': token.decode('ascii'), 'duration': 600,'user_id':g.user.user_id})
+    def post(self):
+        username = request.json['username']
+        password = request.json['password']
+        m1 = md5.new()
+        m1.update(password)
+        password = m1.hexdigest()
+
+        user = User.query.filter_by(user_email = username).first()
+        if not user or not user.verify_password(password):
+            return False
+        token = user.generate_auth_token(3600)
+        return jsonify({'token': token.decode('ascii'), 'duration': 600,'user_id':user.user_id})
 
 
 api.add_resource(userLogin,'/users/login')
