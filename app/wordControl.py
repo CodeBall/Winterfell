@@ -4,7 +4,7 @@
 import pymongo
 import config
 from flask.ext.restful import Resource
-from flask import request
+from flask import request,jsonify
 from app import api,auth
 from app import collect
 from app.models import verify_auth_token
@@ -20,6 +20,10 @@ class WordsAll(Resource):
         for word in words:
             rnt.append(word)
 
+        if not rnt:
+            return{
+                "status":"empty"
+            }
        # json.dumps(rnt)
         return {
             "status": 200,
@@ -34,6 +38,10 @@ class wordsByTime(Resource):
         for word in words:
             rnt.append(word)
 
+        if not rnt:
+            return{
+                "status":"empty"
+            }
         return {
             "status":200,
             "words":rnt
@@ -48,6 +56,10 @@ class wordsByPara(Resource):
         for word in words:
             rnt.append(word)
 
+        if not rnt:
+            return{
+                "status":"empty"
+            }
         return{
             "status":200,
             "words":rnt
@@ -62,6 +74,10 @@ class wordsByOriginal(Resource):
         for word in words:
             rnt.append(word)
 
+        if not rnt:
+            return{
+                "status":"empty"
+            }
         return{
             "status":200,
             "words":rnt
@@ -83,6 +99,10 @@ class wordsByMake(Resource):
         for word in words:
             rnt.append(word)
 
+        if not rnt:
+            return{
+                "status":"empty"
+            }
         return{
             "status":200,
             "words":rnt
@@ -97,19 +117,25 @@ api.add_resource(wordsByMake,'/words/make/<int:userId>/<string:keyWords>')
 #修改释义
 class putParaphrase(Resource):
     def put(self):
-        token = requset.json['token']
+        token = request.json['token']
         user = verify_auth_token(token)
         if user is None:
-            return jsonify({"status":"the token is wrong"})
-        collect.update({"word_id":request.json['word_id']},{"$set":{"paraphrase":request.json['paraphrase']}})
+            return jsonify({"status":"wrong"})
+        collect.update({"word_id":request.json['wordId']},{"$set":{"paraphrase":request.json['paraphrase']}})
+        return{
+            "status":200
+        }
 #修改/添加第一条造句
 class putMake1(Resource):
     def put(self):
         token = request.json['token']
         user = verify_auth_token(token)
         if user is None:
-            return jsonify({"status":"the token is wrong"})
-        collect.update({"word_id":request.json['word_id']},{"$set":{"make_sent1":request.json['make_sent1']}})
+            return jsonify({"status":"wrong"})
+        collect.update({"word_id":request.json['wordId']},{"$set":{"make_sent1":request.json['makeSent1']}})
+        return{
+            "status":200
+        }
 
 #修改/添加第二条造句
 class putMake2(Resource):
@@ -117,8 +143,11 @@ class putMake2(Resource):
         token = request.json['token']
         user = verify_auth_token(token)
         if user is None:
-            return jsonify({"status":"the token is wrong"})
-        collect.update({"word_id":request.json['word_id']},{"$set":{"make_sent2":request.json["make_sent2"]}})
+            return jsonify({"status":"wrong"})
+        collect.update({"word_id":request.json['wordId']},{"$set":{"make_sent2":request.json["makeSent2"]}})
+        return{
+            "status":200
+        }
 
 #修改/添加第三条造句
 class putMake3(Resource):
@@ -126,14 +155,17 @@ class putMake3(Resource):
         token = request.json['token']
         user = verify_auth_token(token)
         if user is None:
-            return jsonify({"status":"the token is wrong"})
-        collect.update({"word_id":request.json['word_id']},{"$set":{"make_sent3":request.json["make_sent3"]}})
+            return jsonify({"status":"wrong"})
+        collect.update({"word_id":request.json['wordId']},{"$set":{"make_sent3":request.json["makeSent3"]}})
+        return{
+            "status":200
+        }
 
 
-api.add_resource(putParaphrase,'/words/put/paraphrase')
-api.add_resource(putMake1,'/words/put/make1')
-api.add_resource(putMake2,'/words/put/make2')
-api.add_resource(putMake3,'/words/put/make3')
+api.add_resource(putParaphrase,'/words/update/paraphrase')
+api.add_resource(putMake1,'/words/update/make1')
+api.add_resource(putMake2,'/words/update/make2')
+api.add_resource(putMake3,'/words/update/make3')
 
 #删除单词信息
 class deleteWord(Resource):
@@ -141,11 +173,29 @@ class deleteWord(Resource):
         token = request.json['token']
         user = verify_auth_token(token)
         if user is None:
-            return jsonify({"status":"the token is wrong"})
-        wordId = request.json['wordId']
-        collect.remove({"word_id":wordId})
+            return jsonify({"status":"wrong"})
+        collect.remove({"word_id":request.json['wordId']})
+        return{
+            "status":200
+        }
 
-api.add_resource(deleteWord,'/words/delete/')
+#删除某个单词的某一个内容
+class updateWord(Resource):
+    def delete(self):
+        token = request.json['token']
+        user = verify_auth_token(token)
+        if user is None:
+            return jsonify({"status":"wrong"})
+        wordId = request.json['wordId']
+        field = request.json['delete_field']
+        value = request.json['delete_value']
+        collect.update({"word_id":wordId},{"$unset":{field:value}})
+        return{
+            "status":200
+        }
+
+api.add_resource(deleteWord,'/words/delete')
+api.add_resource(updateWord,'/words/update')
 
 #添加单词信息
 class addWord(Resource):
@@ -153,14 +203,18 @@ class addWord(Resource):
         token = request.json['token']
         user = verify_auth_token(token)
         if user is None:
-            return jsonify({"status":"the token is wrong"})
+            return jsonify({"status":"wrong"})
         count = collect.find_one({"count_id":1},{"_id":0})
         word_id = count['count']+1
         word = request.json
+        del word['token']
         word["word_id"] = word_id
         word["word_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         collect.insert(word)
         collect.update({"count_id":1},{"$set":{"count":word_id}})
+        return{
+            "status":200
+        }
 
 api.add_resource(addWord,'/words/add')
