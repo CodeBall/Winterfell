@@ -29,7 +29,7 @@ class UserLists(Resource):
         user.user_name = username
         user.user_nikename = nikename
         user.user_email = email
-        user.user_pass = user.hash_password(password)
+        user.user_pass = password
 
         db.session.add(user)
         db.session.commit()
@@ -44,7 +44,7 @@ class UserLists(Resource):
         user.user_name = request.json['username']
         user.user_nikename = request.json['nikename']
         user.user_email = request.json['email']
-        user.user_pass = user.hash_password(request.json['password'])
+        user.user_pass = request.json['password']
         db.session.commit()
         return jsonify({"status":200})
 class UserEmail(Resource):
