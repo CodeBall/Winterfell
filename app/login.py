@@ -17,7 +17,7 @@ class userLogin(Resource):
         if not user or not user.verify_password(password):
             return jsonify({'status':'false'})
         token = user.generate_auth_token(3600)
-        return jsonify({'status':'true','token': token.decode('ascii'), 'duration': 600,'user_id':user.user_id})
+        return jsonify({'status':'true','token': token.decode('ascii'), 'nikename':user.user_nikename,'user_id':user.user_id})
 
 
 api.add_resource(userLogin,'/users/login')
