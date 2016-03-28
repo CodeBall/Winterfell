@@ -14,8 +14,8 @@ import json
 
 #获取所有单词信息
 class WordsAll(Resource):
-    def get(self,userId):
-        words = collect.find({"user_id":userId},{"_id":0})
+    def get(self,userId,No1,count):
+        words = collect.find({"user_id":userId},{"_id":0}).skip(No1).limit(count)
         rnt = []
         for word in words:
             rnt.append(word)
@@ -29,7 +29,12 @@ class WordsAll(Resource):
             "status": 200,
             "words": rnt
         }
-
+class WordsAllCount(Resource):
+    def get(self,userId):
+        count = collect.find({"user_id":userId}).count()
+        return count
+api.add_resource(WordsAll,'/words/<int:userId>/<int:No1>/<int:count>')
+api.add_resource(WordsAllCount,'/words/<int:userId>/count')
 #获取某一时间段的单词信息
 class wordsByTime(Resource):
     def get(self,userId,wordTime):
@@ -49,8 +54,8 @@ class wordsByTime(Resource):
 
 #获取类似于某一释义的单词信息
 class wordsByPara(Resource):
-    def get(self,userId,keyWords):
-        words = collect.find({'user_id':userId,'paraphrase':{'$regex':keyWords}},{'_id':0})
+    def get(self,userId,keyWords,No1,count):
+        words = collect.find({'user_id':userId,'paraphrase':{'$regex':keyWords}},{'_id':0}).skip(No1).limit(count)
 
         rnt = []
         for word in words:
@@ -64,6 +69,13 @@ class wordsByPara(Resource):
             "status":200,
             "words":rnt
         }
+class wordByParaCount(Resource):
+    def get(self,userId,keyWords):
+        count = collect.find({'user_id':userId,'paraphrase':{'$regex':keyWords}},{'_id':0}).count()
+        return count
+
+api.add_resource(wordsByPara,'/words/paraphrase/<int:userId>/<string:keyWords>/<int:No1>/<int:count>')
+api.add_resource(wordByParaCount,'/words/paraphrase/<int:userId>/<string:keyWords>/count')
 
 #根据原句中的关键词找到单词信息
 class wordsByOriginal(Resource):
@@ -108,9 +120,7 @@ class wordsByMake(Resource):
             "words":rnt
         }
 
-api.add_resource(WordsAll,'/words/<int:userId>')
 api.add_resource(wordsByTime,'/words/time/<int:userId>/<string:wordTime>')
-api.add_resource(wordsByPara,'/words/paraphrase/<int:userId>/<string:keyWords>')
 api.add_resource(wordsByOriginal,'/words/original/<int:userId>/<string:keyWords>')
 api.add_resource(wordsByMake,'/words/make/<int:userId>/<string:keyWords>')
 
