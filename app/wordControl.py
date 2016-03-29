@@ -5,17 +5,34 @@ import pymongo
 import config
 from flask.ext.restful import Resource
 from flask import request,jsonify
-from app import api,auth
+from app import api
 from app import collect
 from app.models import verify_auth_token
 from datetime import datetime
-from flask import g
-import json
+
+#根据id查询单词
+class wordsId(Resource):
+    def get(self,wordId):
+        words = collect.find({"word_id":wordId},{"_id":0,"user_id":0,"word_time":0})
+        rnt = []
+        for word in words:
+            rnt.append(word)
+
+        if not word:
+            return{
+                "status":"empty"
+            }
+        return{
+            "status":200,
+            "words":word
+        }
+api.add_resource(wordsId,'/words/<int:wordId>')
 
 #获取所有单词信息
 class WordsAll(Resource):
     def get(self,userId,No1,count):
-        words = collect.find({"user_id":userId},{"_id":0}).skip(No1).limit(count)
+        words = collect.find({"user_id":userId},{"_id":0,"original_sent":0,"word_time":0,"user_id":0,
+                                                 "make_sent1":0,"make_sent2":0,"make_sent3":0}).skip(No1).limit(count)
         rnt = []
         for word in words:
             rnt.append(word)
@@ -37,8 +54,8 @@ api.add_resource(WordsAll,'/words/<int:userId>/<int:No1>/<int:count>')
 api.add_resource(WordsAllCount,'/words/<int:userId>/count')
 #获取某一时间段的单词信息
 class wordsByTime(Resource):
-    def get(self,userId,wordTime):
-        words = collect.find({"user_id":userId,"word_time":{"$regex":wordTime}},{"_id":0})
+    def get(self,userId,wordTime,No1,count):
+        words = collect.find({"user_id":userId,"word_time":{"$regex":wordTime}},{"_id":0}).skip(No1).limit(count)
         rnt = []
         for word in words:
             rnt.append(word)
@@ -51,6 +68,14 @@ class wordsByTime(Resource):
             "status":200,
             "words":rnt
         }
+
+class wordByTimeCount(Resource):
+    def get(self,userId,wordTime):
+        count = collect.find({"user_id":userId,"word_time":{"$regex":wordTime}}).count()
+        return count
+
+api.add_resource(wordByTimeCount,'/words/time/<int:userId>/<string:wordTime>/count')
+api.add_resource(wordsByTime,'/words/time/<int:userId>/<string:wordTime>/<int:No1>/<int:count>')
 
 #获取类似于某一释义的单词信息
 class wordsByPara(Resource):
@@ -79,8 +104,8 @@ api.add_resource(wordByParaCount,'/words/paraphrase/<int:userId>/<string:keyWord
 
 #根据原句中的关键词找到单词信息
 class wordsByOriginal(Resource):
-    def get(self,userId,keyWords):
-        words = collect.find({'user_id':userId,'original_sent':{'$regex':keyWords}},{'_id':0})
+    def get(self,userId,keyWords,No1,count):
+        words = collect.find({'user_id':userId,'original_sent':{'$regex':keyWords}},{'_id':0}).skip(No1).limit(count)
 
         rnt = []
         for word in words:
@@ -94,6 +119,14 @@ class wordsByOriginal(Resource):
             "status":200,
             "words":rnt
         }
+
+class wordsOriginCount(Resource):
+    def get(self,userId,keyWords):
+        count = collect.find({'user_id':userId,'original_sent':{'$regex':keyWords}},{'_id':0}).count()
+        return count
+api.add_resource(wordsByOriginal,'/words/original/<int:userId>/<string:keyWords>/<int:No1>/<int:count>')
+api.add_resource(wordsOriginCount,'/words/original/<int:userId>/<string:keyWords>/count')
+
 
 #根据造句中的关键词找到单词信息
 class wordsByMake(Resource):
@@ -119,10 +152,15 @@ class wordsByMake(Resource):
             "status":200,
             "words":rnt
         }
-
-api.add_resource(wordsByTime,'/words/time/<int:userId>/<string:wordTime>')
-api.add_resource(wordsByOriginal,'/words/original/<int:userId>/<string:keyWords>')
+class wordByMakeCount(Resource):
+    def get(self,userId,keyWords):
+        count = collect.find({'user_id':userId,'make_sent1':{'$regex':keyWords}},{'_id':0}).count()
+        count += collect.find({'user_id':userId,'make_sent2':{'$regex':keyWords}},{'_id':0}).count()
+        count += collect.find({'user_id':userId,'make_sent3':{'$regex':keyWords}},{'_id':0}).count()
+        return count
+api.add_resource(wordByMakeCount,'/words/make/<int:userId>/<string:keyWords>/count')
 api.add_resource(wordsByMake,'/words/make/<int:userId>/<string:keyWords>')
+
 
 #修改释义
 class putParaphrase(Resource):
