@@ -169,7 +169,8 @@ class putParaphrase(Resource):
         user = verify_auth_token(token)
         if user is None:
             return jsonify({"status":"wrong"})
-        collect.update({"word_id":request.json['wordId']},{"$set":{"paraphrase":request.json['paraphrase']}})
+        id = int(request.json['wordId'])
+        collect.update_one({"word_id":id},{"$set":{"paraphrase":request.json['paraphrase']}})
         return{
             "status":200
         }
@@ -180,7 +181,8 @@ class putMake1(Resource):
         user = verify_auth_token(token)
         if user is None:
             return jsonify({"status":"wrong"})
-        collect.update({"word_id":request.json['wordId']},{"$set":{"make_sent1":request.json['makeSent1']}})
+        id = int(request.json['wordId'])
+        collect.update({"word_id":id},{"$set":{"make_sent1":request.json['makeSent1']}})
         return{
             "status":200
         }
@@ -192,7 +194,8 @@ class putMake2(Resource):
         user = verify_auth_token(token)
         if user is None:
             return jsonify({"status":"wrong"})
-        collect.update({"word_id":request.json['wordId']},{"$set":{"make_sent2":request.json["makeSent2"]}})
+        id = int(request.json['wordId'])
+        collect.update({"word_id":id},{"$set":{"make_sent2":request.json["makeSent2"]}})
         return{
             "status":200
         }
@@ -204,7 +207,8 @@ class putMake3(Resource):
         user = verify_auth_token(token)
         if user is None:
             return jsonify({"status":"wrong"})
-        collect.update({"word_id":request.json['wordId']},{"$set":{"make_sent3":request.json["makeSent3"]}})
+        id = int(request.json['wordId'])
+        collect.update({"word_id":id},{"$set":{"make_sent3":request.json["makeSent3"]}})
         return{
             "status":200
         }
@@ -222,7 +226,8 @@ class deleteWord(Resource):
         user = verify_auth_token(token)
         if user is None:
             return jsonify({"status":"wrong"})
-        collect.remove({"word_id":request.json['wordId']})
+        id = int(request.json['wordId'])
+        collect.remove({"word_id":id})
         return{
             "status":200
         }
